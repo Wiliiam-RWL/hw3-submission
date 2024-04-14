@@ -1,0 +1,37 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - echo "Build phase, packaging lambdas..."
+      - echo "Build phase, packaging LF1..."
+      ## - In case lf1 needs to import pacakage
+      - mkdir package1
+      - pip install -r requirements1.txt --target ./package1
+      - cd package1
+      - zip -r ../LF1BuildOutput.zip .
+      - cd ..
+      - zip -g LF1BuildOutput.zip lf1.py
+      # - zip LF1BuildOutput.zip lf1.py
+      - echo "Building phase, packaing LF2..."
+      # - zip LF2BuildOutput.zip lf2.py
+      - mkdir package2
+      - pip install -r requirements2.txt --target ./package2
+      - cd package2
+      - zip -r ../LF2BuildOutput.zip .
+      - cd ..
+      - zip -g LF2BuildOutput.zip lf2.py
+      - echo "Build finished"
+  post_build:
+    commands:
+      - echo "Post-build start, updateing lambda code"
+      - aws lambda update-function-code --function-name hw3-LF1S3ElasticSearch-ZxnPueX9j4nV --zip-file fileb://LF1BuildOutput.zip
+      - aws lambda update-function-code --function-name hw3-LF2Search-ECCmmKVHZbwC --zip-file fileb://LF2BuildOutput.zip
+
+# artifacts:
+#   files:
+#     - LF1BuildOutput.zip
+   
